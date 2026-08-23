@@ -1,0 +1,12 @@
+[dev]
+K8smaster2
+[test]
+K8sworker1
+K8sworker2
+[prod]
+K8smaster3
+K8sworker3
+[balancers]
+K8sworker3
+[webservers:children]
+prod
