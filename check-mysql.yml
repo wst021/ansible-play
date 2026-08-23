@@ -1,0 +1,38 @@
+---
+- name: 检查 MySQL 服务状态
+  hosts: test
+  become: yes
+  tasks:
+    - name: 获取服务状态
+      systemd:
+        name: mysqld
+      register: service_status
+      ignore_errors: yes
+
+    - name: 显示服务状态
+      debug:
+        msg: "MySQL 服务状态: {{ service_status.status.ActiveState }}"
+
+    - name: 检查进程
+      shell: ps aux | grep -E 'mysqld|mysql' | grep -v grep || echo "无MySQL进程"
+      register: process_result
+
+    - name: 显示进程信息
+      debug:
+        var: process_result.stdout_lines
+
+    - name: 检查端口
+      shell: ss -tlnp | grep 3306 || echo "端口3306未被监听"
+      register: port_result
+
+    - name: 显示端口监听状态
+      debug:
+        var: port_result.stdout_lines
+
+    - name: 获取MySQL版本
+      shell: mysql --version 2>/dev/null || echo "MySQL客户端未安装"
+      register: version_result
+
+    - name: 显示版本信息
+      debug:
+        var: version_result.stdout
